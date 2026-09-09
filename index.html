@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agro Assist AI</title>
+<style>
+/* --- CLEAN MODERN PALETTE --- */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8faf9; /* Very light gray-green tint */
+  color: #2c3e50;
+  overflow-x: hidden;
+}
+
+/* --- TOP BAR --- */
+.topbar {
+  background: #ffffff;
+  padding: 10px 20px;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  color: #555;
+  border-bottom: 1px solid #e0e6e3;
+  font-weight: 500;
+}
+
+.bulletin {
+  background: #ecfdf5; /* Soft mint highlight */
+  padding: 12px;
+  font-size: 13px;
+  border-bottom: 1px solid #d1fae5;
+  color: #065f46;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* --- MAIN LAYOUT (From image_c55c1d.png) --- */
+.main-container {
+  display: flex;
+  max-width: 1200px;
+  margin: 50px auto;
+  gap: 40px;
+  padding: 0 20px;
+}
+
+/* Sidebar - Tabs on the left */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 280px;
+}
+
+.nav-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 40px 10px 10px 40px; /* Reference: image_c55c1d.png */
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  color: #475569;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.nav-card:hover {
+  border-color: #10b981;
+  color: #10b981;
+  transform: translateX(8px);
+  background: #f0fff4;
+}
+
+.nav-dot {
+  width: 10px;
+  height: 10px;
+  background: #10b981;
+  border-radius: 50%;
+}
+
+/* Display Box - Hero Frame */
+.display-box {
+  flex: 1;
+  background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), 
+              url("https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1400&q=80");
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 60px;
+  min-height: 480px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* Navigation Arrows from reference image */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 50%;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.arrow:hover {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.arrow-left { left: 20px; }
+.arrow-right { right: 20px; }
+
+/* Hero Typography */
+.hero-title {
+  font-size: 48px;
+  margin: 0;
+  letter-spacing: 1px;
+  color: #064e3b;
+  font-weight: 800;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #4b5563;
+  margin-top: 12px;
+  letter-spacing: 0.5px;
+}
+
+.gov-tag {
+  margin-top: 30px;
+  padding: 8px 20px;
+  border: 1.5px solid #10b981;
+  border-radius: 25px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #10b981;
+  text-transform: uppercase;
+}
+
+/* Indicator dots from image_c55c1d.png footer */
+.slider-dots {
+  position: absolute;
+  bottom: 30px;
+  display: flex;
+  gap: 10px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #cbd5e1;
+  border-radius: 50%;
+}
+
+.dot.active {
+  background: #10b981;
+  width: 24px;
+  border-radius: 10px;
+}
+
+.footer {
+  text-align: center;
+  padding: 40px;
+  font-size: 13px;
+  color: #94a3b8;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 60px;
+}
+
+@media (max-width: 900px) {
+  .main-container { flex-direction: column; }
+  .sidebar { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>MINISTRY OF AGRICULTURE • AI DECISION SYSTEM</div>
+  <div id="weather">Loading weather data...</div>
+</div>
+
+<div class="bulletin">
+  LIVE UPDATE: ML-based crop recommendation system active for all agro-climatic zones
+</div>
+
+<div class="main-container">
+  
+  <!-- SIDEBAR (Reference: image_c55c1d.png) -->
+  <div class="sidebar">
+    <a href="/dashboard" class="nav-card">
+      <div class="nav-dot"></div>
+      <span>IFS Recommendation</span>
+    </a>
+    <a href="#" class="nav-card">
+      <div class="nav-dot"></div>
+      <span>Livestock Model</span>
+    </a>
+    <a href="#" class="nav-card">
+      <div class="nav-dot"></div>
+      <span>Water Planning</span>
+    </a>
+    <a href="#" class="nav-card">
+      <div class="nav-dot"></div>
+      <span>Income Forecast</span>
+    </a>
+    <a href="#" class="nav-card">
+      <div class="nav-dot"></div>
+      <span>Soil Intelligence</span>
+    </a>
+  </div>
+
+  <!-- HERO DISPLAY (Reference: image_c55c1d.png) -->
+  <div class="display-box">
+    <div class="arrow arrow-left">&lt;</div>
+    
+    <div class="hero-content">
+      <p style="text-transform: uppercase; font-weight: 700; color: #10b981; margin-bottom: 5px; font-size: 14px;">Platform Overview</p>
+      <h1 class="hero-title">AGRO ASSIST 2.0</h1>
+      <div class="subtitle">
+        Precision Farming • Policy Integration • Data Driven Sustainability
+      </div>
+      
+      <div class="gov-tag">
+        National Agricultural Intelligence Initiative
+      </div>
+    </div>
+
+    <div class="arrow arrow-right">&gt;</div>
+    
+    <div class="slider-dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  Government Prototype System • Agro Assist Project © 2026
+</div>
+
+<script>
+/* WEATHER LOGIC */
+async function loadWeather(){
+  try{
+    const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=23.2&longitude=77.4&current_weather=true");
+    const d = await res.json();
+    const w = d.current_weather;
+    // Targeting Bhopal as per project context
+    document.getElementById("weather").innerText = `Bhopal: ${w.temperature}°C | Wind: ${w.windspeed} km/h`;
+  } catch(e){
+    document.getElementById("weather").innerText = "Weather unavailable";
+  }
+}
+loadWeather();
+setInterval(loadWeather, 60000);
+</script>
+
+</body>
+</html>

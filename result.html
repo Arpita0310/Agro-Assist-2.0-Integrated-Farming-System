@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AGRO-ASSIST GOV PORTAL</title>
+
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+
+body{
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f4f7f4;
+  margin: 0;
+  color:#1a1a1a;
+}
+
+/* ================= HEADER (OFFICIAL GOV STYLE) ================= */
+.top-report{
+  background: linear-gradient(135deg, #1b5e20, #2e7d32);
+  color: white;
+  text-align: center;
+  padding: 28px 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.top-report h1{
+  font-size: 28px;
+  margin: 0;
+  letter-spacing: 0.4px;
+}
+
+.zone-box{
+  background: rgba(255,255,255,0.15);
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+/* ================= WEATHER ================= */
+.weather-strip{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:10px;
+  margin-top:10px;
+  justify-content:center;
+}
+
+.weather-box{
+  min-width:150px;
+  background:white;
+  color:#111;
+  border-radius:10px;
+  padding:10px;
+  font-size:12px;
+  border:1px solid #ddd;
+  text-align:left;
+}
+
+/* ================= LAYOUT ================= */
+.container{
+  max-width: 1200px;
+  margin: auto;
+  padding: 18px;
+}
+
+/* ================= GOV CARD SYSTEM ================= */
+.plan-card{
+  background:white;
+  border-radius:12px;
+  padding:16px;
+  margin:15px 0;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  border-left:4px solid #1b5e20;
+}
+
+.plan-card:hover{
+  box-shadow:0 6px 16px rgba(0,0,0,0.1);
+}
+
+/* badge */
+.badge{
+  display:inline-block;
+  background:#e8f5e9;
+  color:#1b5e20;
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+}
+
+/* sections */
+.section{
+  background:#f7f7f7;
+  padding:10px;
+  border-radius:8px;
+  margin-top:10px;
+  font-size:13px;
+}
+
+/* pollination */
+.pollination{
+  margin-top:10px;
+  padding:12px;
+  border-radius:10px;
+  background:#f3f8f3;
+  border:1px solid #d6e6d6;
+}
+
+/* MAP */
+#map{
+  height:380px;
+  margin-top:10px;
+  border-radius:12px;
+}
+
+/* CHART */
+canvas{
+  background:white;
+  border-radius:12px;
+  padding:10px;
+  margin-top:15px;
+}
+
+/* GOV SECTION TITLE */
+.section-title{
+  font-weight:700;
+  margin-bottom:6px;
+  color:#1b5e20;
+  font-size:14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<div class="top-report">
+
+  <h1 id="districtTitle"></h1>
+
+  <div class="zone-box" id="zoneLine"></div>
+
+  <!-- WEATHER FORECAST -->
+  <div class="weather-strip" id="weatherStrip"></div>
+
+</div>
+
+<div class="container">
+
+<!-- ENVIRONMENT -->
+<div class="plan-card">
+  <div class="section-title">Environmental Snapshot</div>
+  <div class="section" id="locationBox"></div>
+</div>
+
+<!-- CHART -->
+<canvas id="incomeChart"></canvas>
+
+<!-- PLANS HEADER -->
+<div class="plan-card">
+  <div class="section-title">ML Generated Agricultural Plans</div>
+</div>
+
+<!-- PLANS -->
+<div class="plan-grid" id="plans"></div>
+
+<!-- ADVISORY -->
+<div class="plan-card">
+  <div class="section-title">Integrated Advisory System</div>
+  <p style="font-size:13px;margin:0;">
+    ML-based recommendations for sustainable farming, irrigation, livestock optimization and income forecasting.
+  </p>
+</div>
+
+<!-- SUBSIDY -->
+<div class="plan-card" id="subsidyBox"></div>
+
+<!-- MAP -->
+<div class="plan-card">
+  <div class="section-title">Soil Intelligence Map</div>
+  <div id="map"></div>
+</div>
+
+</div>
+
+<script>
+
+const data = JSON.parse(localStorage.getItem("agroResult") || "{}");
+
+/* ================= HEADER ================= */
+document.getElementById("districtTitle").innerText =
+  data.location?.district || "Unknown District";
+
+document.getElementById("zoneLine").innerText =
+  `Zone: ${data.location?.zone || "-"} | Season: ${data.input?.season || "-"}`;
+
+/* ================= WEATHER ================= */
+const weather = [
+  {d:"Day 1", temp:28, rain:12, wind:10},
+  {d:"Day 2", temp:29, rain:20, wind:12},
+  {d:"Day 3", temp:27, rain:55, wind:8},
+  {d:"Day 4", temp:30, rain:18, wind:11}
+];
+
+document.getElementById("weatherStrip").innerHTML =
+weather.map(w=>`
+  <div class="weather-box">
+    <b>${w.d}</b><br>
+    Temp: ${w.temp}°C<br>
+    Rain: ${w.rain} mm<br>
+    Wind: ${w.wind} km/h
+  </div>
+`).join("");
+
+
+/* ================= SNAPSHOT ================= */
+document.getElementById("locationBox").innerHTML = `
+Temperature: ${data.weather?.temperature}°C |
+Soil pH: ${data.soil?.ph}
+`;
+
+/* ================= CHART ================= */
+new Chart(document.getElementById("incomeChart"), {
+  type: "line",
+  data: {
+    labels: data.plans.map(p => p.id),
+    datasets: [
+      {
+        label: "Income",
+        data: data.plans.map(p => p.metrics?.income || 0),
+        borderColor: "#1b5e20",
+        tension: 0.4,
+        fill: false
+      },
+      {
+        label: "Score",
+        data: data.plans.map(p => p.score || 0),
+        borderColor: "#2e7d32",
+        tension: 0.4,
+        fill: false
+      }
+    ]
+  }
+});
+
+/* ================= PLANS ================= */
+let html = "";
+
+data.plans.forEach(p => {
+
+html += `
+<div class="plan-card">
+
+  <span class="badge">${p.strategy}</span>
+
+  <h3>${p.id}</h3>
+  <b>Score:</b> ${p.score}
+
+  <div class="section">
+    <b>Crops</b><br>${p.crops.join(", ")}
+  </div>
+
+  <div class="section">
+    <b>Tree</b><br>${p.tree}
+  </div>
+
+  <div class="section">
+    <b>Livestock System</b><br>
+    Dairy: ${p.dairy}<br>
+    Livestock: ${p.livestock}
+  </div>
+
+  <div class="section">
+    <b>Financial Output</b><br>
+    Income: ${p.metrics?.income}
+  </div>
+
+  <div class="pollination">
+    <b>Pollination Impact Score</b><br>
+    Flower: ${p.flower || "-"}<br>
+    Bee System: ${p.bee || "-"}<br>
+    Score: ${p.pollination_score || 0}
+  </div>
+
+</div>`;
+});
+
+document.getElementById("plans").innerHTML = html;
+
+/* ================= SUBSIDY ================= */
+document.getElementById("subsidyBox").innerHTML = `
+<div class="section-title">Government Agricultural Support Framework</div>
+
+<p>PM-Kisan Scheme • Direct income support to farmers</p>
+<p>Micro Irrigation Subsidy • Up to 55% assistance</p>
+<p>Soil Health Card • Scientific crop guidance</p>
+<p>NABARD Fund • Rural infrastructure development</p>
+`;
+
+/* ================= MAP ================= */
+const map = L.map('map').setView([26.8,80.9],6);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+L.circleMarker([26.8,80.9],{
+  radius:10,
+  color:"#1b5e20"
+}).addTo(map);
+
+</script>
+
+</body>
+</html>

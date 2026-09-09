@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro-Assist 2.0 | Digital India</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root { --primary: #1b5e20; --secondary: #f9a825; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; }
+        .gov-header { background: #fff; border-bottom: 3px solid var(--primary); padding: 10px 5%; display: flex; align-items: center; justify-content: space-between; }
+        .nav-bar { background: var(--primary); color: white; padding: 10px 5%; display: flex; gap: 20px; }
+        .nav-bar a { color: white; text-decoration: none; font-weight: 500; font-size: 14px; text-transform: uppercase; }
+        .nav-bar a:hover { color: var(--secondary); }
+        footer { background: #222; color: white; text-align: center; padding: 20px; margin-top: 50px; border-top: 5px solid var(--secondary); }
+    </style>
+</head>
+<body>
+    <header class="gov-header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fa-solid fa-seedling" style="font-size: 40px; color: var(--primary);"></i>
+            <div>
+                <h2 style="margin:0; color: var(--primary);">AGRO-ASSIST 2.0</h2>
+                <small>AI-Based Integrated Farming Advisory Portal</small>
+            </div>
+        </div>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem" height="50">
+    </header>
+
+    <nav class="nav-bar">
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/recommend"><i class="fa-solid fa-chart-line"></i> Analysis</a>
+        <a href="/dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2026 Agro-Assist 2.0 - Developed for Minor Project Excellence</p>
+        <small>Department of Computer Science & Engineering</small>
+    </footer>
+</body>
+</html>

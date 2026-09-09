@@ -1,0 +1,166 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div style="padding: 40px 5%;">
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+        
+        <!-- MAIN FORM CARD -->
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            
+            <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                 Farming Analysis Input
+            </h3>
+
+            <!-- FIX: form id SAME as script.js -->
+            <form id="farmForm" style="display: grid; gap: 20px; margin-top: 20px;">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    
+                    <div>
+                        <label>State</label>
+                        <select id="state" name="state" style="width: 100%; padding: 10px;">
+                            <option value="">Select State</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>District</label>
+                        <select id="district" name="district" style="width: 100%; padding: 10px;">
+                            <option value="">Select District</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    
+                    <div>
+                        <label>Land Size (Acres)</label>
+                        <input type="number" name="land" style="width: 100%; padding: 10px;">
+                    </div>
+
+                    <div>
+                        <label>Water Availability</label>
+                        <select name="water" style="width: 100%; padding: 10px;">
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- FIX: type submit (IMPORTANT) -->
+                <button type="submit"
+                    style="background: var(--primary); color: white; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                    GENERATE FARMING PLAN 🌱
+                </button>
+
+            </form>
+        </div>
+
+        <!-- SIDE INFO PANEL -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <div style="background: #e8f5e9; padding: 20px; border-left: 5px solid var(--primary); border-radius: 5px;">
+                <h4>🌦 Weather Summary</h4>
+                <p id="weather-text">Select district to view forecast</p>
+            </div>
+
+            <div style="background: #fff8e1; padding: 20px; border-left: 5px solid var(--secondary); border-radius: 5px;">
+                <h4>🧪 Soil Profile</h4>
+                <p>Standard pH: 6.5 - 7.5<br>Fertility: Moderate to High</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- RESULTS SECTION -->
+    <div id="results" style="display: none; margin-top: 40px;">
+        <h2 style="text-align: center; color: var(--primary);">Recommended IFS Strategy</h2>
+        <div id="plan-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("farmForm");
+
+    // -------------------------
+    // SUBMIT FIXED (IMPORTANT)
+    // -------------------------
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const data = {
+            state: document.getElementById("state").value,
+            district: document.getElementById("district").value,
+            land: document.querySelector("[name='land']").value,
+            water: document.querySelector("[name='water']").value
+        };
+
+        try {
+            const response = await fetch("/get_recommendation", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            console.log("API RESPONSE:", result);
+
+            renderResults(result);
+
+        } catch (err) {
+            alert("Server error");
+            console.log(err);
+        }
+    });
+
+});
+
+// -------------------------
+// RENDER FUNCTION FIXED
+// -------------------------
+function renderResults(data) {
+
+    const container = document.getElementById("plan-container");
+    document.getElementById("results").style.display = "block";
+
+    container.innerHTML = "";
+
+    if (!data || !data.plans) {
+        container.innerHTML = "<div class='card'>No plans generated</div>";
+        return;
+    }
+
+    data.plans.forEach(plan => {
+        container.innerHTML += `
+            <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid #ddd; position: relative;">
+                
+                <div style="background: var(--primary); color: white; position: absolute; top: 0; right: 0; padding: 5px 15px; border-radius: 0 10px 0 10px;">
+                    Score: ${plan.score}
+                </div>
+
+                <h3 style="color: var(--primary); margin-top: 10px;">
+                    ${plan.title}
+                </h3>
+
+                <p><strong>Main Crops:</strong> ${(plan.main_crops || []).join(" & ")}</p>
+                <p><strong>System:</strong> ${plan.system}</p>
+
+                <hr>
+
+                <p style="color: green; font-weight: bold;">
+                    Estimated Profit: ₹${plan.profit}
+                </p>
+
+            </div>
+        `;
+    });
+}
+</script>
+
+{% endblock %}
